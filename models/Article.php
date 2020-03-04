@@ -101,7 +101,6 @@ class Article extends \yii\db\ActiveRecord
     public function saveCategory($category_id)
     {
         $category = Category::findOne($category_id);
-
         if($category != NULL)
         {
             $this->link('category', $category);
@@ -138,6 +137,4 @@ class Article extends \yii\db\ActiveRecord
     {
         ArticleTag::deleteAll(['article_id' => $this->id]);
     }
-
-
 }
