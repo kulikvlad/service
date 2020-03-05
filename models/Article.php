@@ -5,6 +5,7 @@ namespace app\models;
 use phpDocumentor\Reflection\DocBlock\Tags\Reference\Url;
 use Yii;
 use app\models\UploadImage;
+use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 
 //use app\models\Category;
@@ -136,5 +137,32 @@ class Article extends \yii\db\ActiveRecord
     public function clearCurrentTags()
     {
         ArticleTag::deleteAll(['article_id' => $this->id]);
+    }
+
+    public function getDate()
+    {
+        return Yii::$app->formatter->asDate($this->date);
+    }
+
+    public static function getAll($pageSize = 5)
+    {
+        $query = Article::find();
+        $countQuery = clone $query;
+        $pages = new Pagination(['totalCount' => $countQuery->count(),'pageSize' => $pageSize]);
+        $models = $query->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
+        $data['models'] = $models;
+        $data['pages'] = $pages;
+        return $data;
+    }
+
+    public static function getPopular()
+    {
+        return Article::find()->orderBy('VIEWED DESC')->limit(3) ->all();
+    }
+    public static function getRecent()
+    {
+        return Article::find()->orderBy('DATE ASC')->limit(4)->all();
     }
 }
