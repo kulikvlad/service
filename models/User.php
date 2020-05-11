@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\base\Model;
 use yii\web\IdentityInterface;
 
 /**
@@ -104,9 +105,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     }
 
-    public static function findByUsername($username)
+    public static function findByEmail($email)
     {
-        return User::find()->where(['name'=>$username])->one();
+        return User::find()->where(['email'=>$email])->one();
     }
 
 
@@ -115,4 +116,25 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return ($this->password == $password) ? true : false;
     }
 
+    public function create()
+    {
+        return $this->save(false);
+    }
+
+    public function saveFromVk($id, $name, $photo)
+    {
+        $user = User::findOne($id);
+
+        if($user)
+        {
+            return Yii::$app->user->login($user);
+        }
+
+        $this->id = $id;
+        $this->name = $name;
+        $this->photo = $photo;
+        $this->create();
+
+        return Yii::$app->user->login($this);
+    }
 }
